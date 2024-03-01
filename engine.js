@@ -1,12 +1,34 @@
 // matter.js
 
+// Set up the canvas
+const canvas = document.createElement("canvas");
+document.body.appendChild(canvas);
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const context = canvas.getContext("2d");
+
+const objects = [];
+let stars = [];
+let comets = [];
+let lastClickedPlanet = null;
+
+setupEventListeners();
+
 // allows user slider selection to work
 let gravity = 0.0001; // Universal Gravitational Constant, adjust as needed for simulation scale
 scalar = 20;
 window.addEventListener("resize", function () {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width = Math.min(window.innerWidth, 1920);
+  canvas.height = Math.min(window.innerHeight, 1080);
+  generateStars(10000);
 });
+
+// zoom and scroll
+let scale = 1;
+const zoomSensitivity = 0.1;
+let pan = { x: 0, y: 0 };
+let dragStart = { x: 0, y: 0 };
+let isDragging = false;
 
 // balls balls balls
 class PhysicsObject {
@@ -94,16 +116,6 @@ class PhysicsObject {
 
     context.fillStyle = "white";
     context.fillText(this.name, this.x, this.y + 20);
-
-    context.font = "28px Arial";
-    context.fillStyle = "white"; // Choose a text color that stands out
-    context.textAlign = "center"; // Align text to be in the center
-    context.fillText("Scale Solar System by Dali", canvas.width / 2, 30); // Position text in the middle at the top
-
-    context.font = "16px Arial";
-    context.fillStyle = "white";
-    context.textAlign = "center";
-    context.fillText("(sun not to scale)", canvas.width / 2, 50);
   }
 }
 
@@ -165,7 +177,7 @@ function initializeSolarSystem() {
 
   for (let i = 0; i < 9; i++) {
     const distance = planetDistances[i] / Math.sqrt(scalar); // Distance from the Sun
-    const planetRadius = planetRadiuses[i] / 1000; // Varying sizes
+    const planetRadius = planetRadiuses[i] / 1500; // Varying sizes
     const planetMass = planetMasses[i] / scalar; // Mass based on size (density)
     const planetColor = planetColors[i];
     const angle = Math.random() * 2 * Math.PI;
@@ -191,31 +203,6 @@ function initializeSolarSystem() {
   }
 }
 
-// Set up the canvas
-const canvas = document.createElement("canvas");
-document.body.appendChild(canvas);
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-const context = canvas.getContext("2d");
-
-const objects = [];
-
-function animate() {
-  requestAnimationFrame(animate);
-  context.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Update and draw stars
-  stars.forEach((star) => {
-    star.update();
-    star.draw(context);
-  });
-
-  objects.forEach((object) => {
-    object.update();
-    object.draw(context);
-  });
-}
-
 class Star {
   constructor(x, y, size) {
     this.x = x;
@@ -236,13 +223,14 @@ class Star {
     context.fill();
   }
 }
-let stars = [];
+let maxViewWidth = canvas.width * 8;
+let maxViewHeight = canvas.height * 8;
 
 function generateStars(count) {
   stars = [];
   for (let i = 0; i < count; i++) {
-    const x = Math.random() * canvas.width;
-    const y = Math.random() * canvas.height;
+    const x = Math.random() * maxViewWidth - maxViewWidth / 2;
+    const y = Math.random() * maxViewHeight - maxViewHeight / 2;
     const size = Math.random() * 2; // Size range between 0 and 2 pixels
     stars.push(new Star(x, y, size));
   }
@@ -256,8 +244,8 @@ class Comet {
   reset() {
     // Initialize the comet at a random position on the canvas edge
     if (Math.random() < 0.5) {
-      this.x = Math.random() < 0.5 ? 0 : canvas.width; // Start from left or right edge
-      this.y = Math.random() * canvas.height;
+      this.x = Math.random() < 0.5 ? 0 : maxViewWidth - maxViewWidth / 2; // Start from left or right edge
+      this.y = Math.random() * maxViewWidth - maxViewWidth / 2;
     } else {
       this.x = Math.random() * canvas.width;
       this.y = Math.random() < 0.5 ? 0 : canvas.height; // Start from top or bottom edge
@@ -323,8 +311,6 @@ class Comet {
     context.fill();
   }
 }
-
-let comets = [];
 const numberOfComets = 3;
 
 function initializeComets() {
@@ -340,54 +326,7 @@ function updateAndDrawComets(context) {
   });
 }
 
-function animate() {
-  requestAnimationFrame(animate);
-  context.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Update and draw stars
-  stars.forEach((star) => {
-    star.update();
-    star.draw(context);
-  });
-
-  // Update and draw the comet
-  updateAndDrawComets(context);
-
-  // Update and draw physics objects
-  objects.forEach((object) => {
-    object.update();
-    object.draw(context);
-  });
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-  generateStars(400);
-  initializeSolarSystem();
-  initializeComets();
-  animate();
-});
-
 // for planet information
-let lastClickedPlanet = null;
-
-canvas.addEventListener("click", function (event) {
-  const rect = canvas.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
-  checkPlanetClick(x, y);
-});
-
-function checkPlanetClick(x, y) {
-  objects.forEach((object) => {
-    const distance = Math.sqrt((x - object.x) ** 2 + (y - object.y) ** 2);
-    if (distance < object.radius) {
-      // The planet has been clicked
-      object.radius *= 1.2; // Enlarge the planet by 50%
-      lastClickedPlanet = object;
-      displayPlanetModal(object.name); // Open information page based on the planet name
-    }
-  });
-}
 
 function displayPlanetModal(planetName) {
   const planetInfoMap = {
@@ -421,39 +360,162 @@ function displayPlanetModal(planetName) {
   }
 }
 
-canvas.addEventListener("mousemove", function (event) {
-  const rect = canvas.getBoundingClientRect();
-  const mouseX = event.clientX - rect.left;
-  const mouseY = event.clientY - rect.top;
+function drawFixedText(context) {
+  context.font = "34px Arial";
+  context.fillStyle = "white"; // Choose a text color that stands out
+  context.textAlign = "center"; // Align text to be in the center
+  context.fillText("Scale Solar System by Dali", canvas.width / 2, 30); // Position text in the middle at the top
 
+  context.font = "18px Arial";
+  context.fillStyle = "white";
+  context.textAlign = "center";
+  context.fillText("(sun not to scale)", canvas.width / 2, 50);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Apply transformations for zoom and pan
+  context.save();
+  context.translate(pan.x, pan.y);
+  context.scale(scale, scale);
+
+  // Draw stars
+  stars.forEach((star) => {
+    star.update();
+    star.draw(context);
+  });
+
+  // Draw comets
+  comets.forEach((comet) => {
+    comet.update();
+    comet.draw(context);
+  });
+
+  // Draw physics objects (planets, etc.)
   objects.forEach((object) => {
-    const distance = Math.sqrt(
-      (mouseX - object.x) ** 2 + (mouseY - object.y) ** 2
-    );
-    if (distance < object.radius && !object.isHovered) {
-      if (!object.originalRadius) object.originalRadius = object.radius;
-      if (object.originalRadius > 10) {
-        object.radius = object.originalRadius * 1.2; // Increase radius by 20% on hover
-        object.isHovered = true;
-      } else if (object.originalRadius > 5) {
-        object.radius = object.originalRadius * 2; // Increase radius by 20% on hover
-        object.isHovered = true;
-      } else {
-        object.radius = object.originalRadius * 3; // Increase radius by 20% on hover
-        object.isHovered = true;
+    object.update();
+    object.draw(context);
+  });
+
+  // Restore the context to avoid affecting other drawing operations
+  context.restore();
+
+  drawFixedText(context);
+}
+
+function initialize() {
+  // Initialize solar system, stars, and any other initial setup
+  initializeSolarSystem();
+  generateStars(8000); // Adjust count based on your needs
+  initializeComets();
+  animate();
+}
+
+function setupEventListeners() {
+  canvas.addEventListener("click", function (event) {
+    const rect = canvas.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / scale - pan.x / scale;
+    const y = (event.clientY - rect.top) / scale - pan.y / scale;
+    checkPlanetClick(x, y);
+  });
+
+  function checkPlanetClick(x, y) {
+    objects.forEach((object) => {
+      const distance = Math.sqrt((x - object.x) ** 2 + (y - object.y) ** 2);
+      if (distance < object.radius) {
+        // The planet has been clicked
+        object.radius *= 1.2; // Enlarge the planet by 50%
+        lastClickedPlanet = object;
+        displayPlanetModal(object.name); // Open information page based on the planet name
       }
-    } else if (distance >= object.radius && object.isHovered) {
-      object.radius = object.originalRadius; // Restore original radius
-      object.isHovered = false;
+    });
+  }
+  // Close the modal when the user clicks on <span> (x)
+  document.getElementById("closeModal").onclick = function () {
+    if (lastClickedPlanet) {
+      lastClickedPlanet.radius *= 5 / 6;
+      lastClickedPlanet = null;
+    }
+    document.getElementById("planetModal").style.display = "none";
+  };
+
+  canvas.addEventListener("mousemove", function (event) {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = (event.clientX - rect.left - pan.x) / scale;
+    const mouseY = (event.clientY - rect.top - pan.y) / scale;
+    objects.forEach((object) => {
+      const distance = Math.sqrt(
+        (mouseX - object.x) ** 2 + (mouseY - object.y) ** 2
+      );
+      if (distance < object.radius && !object.isHovered) {
+        object.originalRadius = object.originalRadius || object.radius;
+        if (object.radius > 10) {
+          object.radius = object.originalRadius * 1.2; // Increase radius by 20% on hover
+        } else if (object.radius > 5) {
+          object.radius = object.originalRadius * 1.5;
+        } else if (object.radius > 1) {
+          object.radius = object.originalRadius * 1.8;
+        } else {
+          object.radius = object.originalRadius * 2;
+        }
+        object.isHovered = true;
+      } else if (distance >= object.radius && object.isHovered) {
+        object.radius = object.originalRadius; // Restore original radius
+        object.isHovered = false;
+      }
+    });
+
+    if (isDragging) {
+      pan.x = event.clientX - dragStart.x;
+      pan.y = event.clientY - dragStart.y;
     }
   });
-});
+  canvas.addEventListener("wheel", function (event) {
+    event.preventDefault();
 
-// Close the modal when the user clicks on <span> (x)
-document.getElementById("closeModal").onclick = function () {
-  if (lastClickedPlanet) {
-    lastClickedPlanet.radius *= 5 / 6;
-    lastClickedPlanet = null;
-  }
-  document.getElementById("planetModal").style.display = "none";
-};
+    // Calculate the position of the mouse relative to the center of the canvas
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    // Calculate the position of the mouse in the world (considering current pan and scale)
+    const worldMouseX = (mouseX - pan.x) / scale;
+    const worldMouseY = (mouseY - pan.y) / scale;
+
+    // Determine the direction and amount to zoom
+    const zoomIntensity = 0.1;
+    const wheel = event.deltaY < 0 ? 1 : -1;
+    const zoomFactor = Math.exp(wheel * zoomIntensity);
+
+    // Apply the zoom
+    scale *= zoomFactor;
+
+    // Limit the scale to prevent zooming too far in or out
+    scale = Math.max(0.1, Math.min(scale, 10));
+
+    // Adjust pan to keep the mouse position stable in the world
+    pan.x = mouseX - worldMouseX * scale;
+    pan.y = mouseY - worldMouseY * scale;
+  });
+
+  canvas.addEventListener("mousedown", function (event) {
+    isDragging = true;
+    dragStart.x = event.clientX - pan.x;
+    dragStart.y = event.clientY - pan.y;
+  });
+
+  window.addEventListener("mousemove", function (event) {});
+
+  window.addEventListener("mouseup", function () {
+    isDragging = false;
+  });
+
+  window.addEventListener("resize", function () {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initialize);
