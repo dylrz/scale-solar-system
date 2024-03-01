@@ -370,16 +370,16 @@ function drawFixedText(context) {
   context.fillStyle = "white";
   context.textAlign = "center";
   context.fillText(
-    `(sun not to scale, press "Scale Sun" to see what it would look like!)`,
+    `On this scale, one Earth year passes every 40 seconds`,
     canvas.width / 2,
     60
   );
 
-  context.font = "18px Arial";
+  context.font = "16px Arial";
   context.fillStyle = "white";
   context.textAlign = "center";
   context.fillText(
-    `On this scale, one Earth year passes every 40 seconds`,
+    `(sun not to scale, press "Scale Sun" to see what it would look like!)`,
     canvas.width / 2,
     85
   );
