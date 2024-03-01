@@ -18,6 +18,7 @@ class PhysicsObject {
     this.color = color;
     this.isStationary = isStationary;
     this.name = name;
+    this.isHovered = false;
     this.positions = [];
     this.velocity = { x: 0, y: 0 };
     this.acceleration = { x: 0, y: 0.2 }; // Simulating gravity
@@ -122,7 +123,7 @@ function initializeSolarSystem() {
       sunMass,
       "yellow",
       true,
-      "sun",
+      "Sun",
       "black"
     )
   );
@@ -144,11 +145,11 @@ function initializeSolarSystem() {
     "pink",
     "lightblue",
     "red",
-    "orange",
-    "yellow",
-    "purple",
-    "darkblue",
-    "white",
+    "#FF7000",
+    "#FF9E00",
+    "#00FFD8",
+    "#0023FF",
+    "#999",
   ];
   const planetNames = [
     "Mercury",
@@ -365,3 +366,94 @@ document.addEventListener("DOMContentLoaded", function () {
   initializeComets();
   animate();
 });
+
+// for planet information
+let lastClickedPlanet = null;
+
+canvas.addEventListener("click", function (event) {
+  const rect = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  checkPlanetClick(x, y);
+});
+
+function checkPlanetClick(x, y) {
+  objects.forEach((object) => {
+    const distance = Math.sqrt((x - object.x) ** 2 + (y - object.y) ** 2);
+    if (distance < object.radius) {
+      // The planet has been clicked
+      object.radius *= 1.2; // Enlarge the planet by 50%
+      lastClickedPlanet = object;
+      displayPlanetModal(object.name); // Open information page based on the planet name
+    }
+  });
+}
+
+function displayPlanetModal(planetName) {
+  const planetInfoMap = {
+    Sun: "The solar systems largest nuclear reactor, the Sun is made up of predominantly hydrogen and helium. If the sun in this model were scaled by the same factor as the planets, it would cover the entire screen!",
+    Mercury:
+      "Mercury, the closest planet to the Sun, is named after the swift messenger god. Good job successfully clicking on this! The surface color is gray, resembling the Moon, with surface temperatures ranging from -173 to 427°C.",
+    Venus:
+      "Venus is about 108.2 million km away from the Sun. Known for its bright, yellowish-white color, Venus experiences extreme greenhouse effects, a result of it's C02 rich atmosphere, with surface temperatures hovering around 465°C.",
+    Earth:
+      "Earth, our home planet. With an average surface temperature of 14°C, it is the only planet in the solar system that can sustain life as we know it. Also, the only planet known to support Instagram Reels. Better take good care of it!",
+    Mars: "Mars, known as the Red Planet, is 227.9 million km from the Sun, and was once the home of famous actor Matt Damon. Its reddish appearance comes from the plentiful iron oxide dust. Temperatures on Mars can vary widely, averaging around -60°C.",
+    Jupiter:
+      "Jupiter, the largest planet in our solar system, has a mass of 1,898 x 10^24 kg (or 17,434 trillion blue whales for you Americans) and is 778.5 million km from the Sun. Its striking appearance with bands of white, red, orange, brown, and yellow are due to its gaseous nature. The average temperature is about -145°C.",
+    Saturn:
+      "Saturn, famous for its beautiful ring system, is about 1.434 billion km away from the Sun (Just a tad closer than you've ever been to feeling true love). Its pale yellow color is due to ammonia crystals in its atmosphere. Temperatures are cold, averaging -178°C.",
+    Uranus:
+      "Uranus, the brunt of many a joke, is distinguished by its blue-green color, occuring due to methane in its atmosphere. It is 2.871 billion km from the Sun, and has an unusual tilt, essentially orbiting the Sun on its side, which scientists attribute to a collision with an Earth-sized object a very long time ago. Average temperatures are around -224°C.",
+    Neptune:
+      "Neptune is known for its vivid blue color, and holds the record for the fastest winds in the solar system. It 4.495 billion km from the Sun and is the coldest of the planets, with temperatures dipping to -214°C. Brr.",
+    Pluto:
+      "If you somehow clicked on this, congrats. Pluto, the most relatable planet, is 5.906 billion km from the Sun. Its color varies from white to charcoal black, with surface temperatures averaging -229°C. Pluto was reclassified as a dwarf planet in 2006, and has a heart-shaped glacier to show it still loves us.",
+  };
+
+  const info = planetInfoMap[planetName];
+  if (info) {
+    document.getElementById("planetName").innerText = planetName;
+    document.getElementById("planetInfo").innerText = info;
+    document.getElementById("planetModal").style.display = "block";
+  } else {
+    console.log("No information available for " + planetName);
+  }
+}
+
+canvas.addEventListener("mousemove", function (event) {
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+
+  objects.forEach((object) => {
+    const distance = Math.sqrt(
+      (mouseX - object.x) ** 2 + (mouseY - object.y) ** 2
+    );
+    if (distance < object.radius && !object.isHovered) {
+      if (!object.originalRadius) object.originalRadius = object.radius;
+      if (object.originalRadius > 10) {
+        object.radius = object.originalRadius * 1.2; // Increase radius by 20% on hover
+        object.isHovered = true;
+      } else if (object.originalRadius > 5) {
+        object.radius = object.originalRadius * 2; // Increase radius by 20% on hover
+        object.isHovered = true;
+      } else {
+        object.radius = object.originalRadius * 3; // Increase radius by 20% on hover
+        object.isHovered = true;
+      }
+    } else if (distance >= object.radius && object.isHovered) {
+      object.radius = object.originalRadius; // Restore original radius
+      object.isHovered = false;
+    }
+  });
+});
+
+// Close the modal when the user clicks on <span> (x)
+document.getElementById("closeModal").onclick = function () {
+  if (lastClickedPlanet) {
+    lastClickedPlanet.radius *= 5 / 6;
+    lastClickedPlanet = null;
+  }
+  document.getElementById("planetModal").style.display = "none";
+};

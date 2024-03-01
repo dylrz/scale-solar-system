@@ -21,3 +21,8 @@ input {
     align-content: center;
     justify-content: center;
 }
+
+#planetModal .modal-content {
+  overflow-y: auto; /* Make content scrollable */
+  max-height: 80%; /* Maximum height before scrolling */
+}
