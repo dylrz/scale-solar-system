@@ -16,17 +16,25 @@
     </audio>
     <button id="scaleSunButton">Scale Sun</button>
 
+    <button
+      id="infoButton"
+      style="position: absolute; top: 20px; right: 20px; z-index: 100"
+    >
+      Info
+    </button>
+
     <div
-      id="planetModal"
+      id="infoModal"
       style="
         display: none;
         position: fixed;
+        z-index: 101;
         left: 0;
         top: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 2;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
       "
     >
       <div
@@ -39,30 +47,54 @@
           max-width: 600px;
         "
       >
-        <span
-          id="closeModal"
-          style="
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-          "
-          >&times;</span
-        >
-        <h2
-          id="planetName"
-          style="
-            color: #fff;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-          "
-        ></h2>
-        <p
-          id="planetInfo"
-          style="color: #ccc; font-size: 22px; cursor: pointer"
-        ></p>
+        <span id="closeInfoModal">&times;</span>
+        <h2>About This Site</h2>
+        <p>
+          This site is a visual simulation of the solar system, including the
+          planets and other significant objects like Voyager 1. It demonstrates
+          the beauty and scale of our solar system and beyond. More objects are
+          being added, so check back for more!
+        </p>
+        <p>
+          In this model, a mere 16 seconds represents a year in the endless
+          dance of time. If you watch long enough, you'll see the subtle
+          elliptic nature of the planets' orbits, a result of the gravity the
+          celestial bodies exert on one another. We are all connected in the
+          vast expanse of space.
+        </p>
+        <p>Enjoy exploring!</p>
+        <p style="color: #aaa; font-size: 14px">
+          Website Created by Dylan Zhai
+        </p>
+        <p style="color: #aaa; font-size: 14px">Music By: Serge Pavkin Music</p>
+      </div>
+    </div>
+
+    <div
+      id="planetModal"
+      style="
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      "
+    >
+      <div
+        style="
+          background-color: rgba(0, 0, 0, 0.5);
+          margin: 15% auto;
+          padding: 24px;
+          border: 1px solid #888;
+          width: 80%;
+          max-width: 600px;
+        "
+      >
+        <span id="closePlanetModal">&times;</span>
+        <h2 id="planetName"></h2>
+        <p id="planetInfo"></p>
       </div>
     </div>
 

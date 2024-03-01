@@ -19,7 +19,7 @@ setupEventListeners();
 let gravity = 0.00001; // Universal Gravitational Constant, adjust as needed for simulation scale
 scalar = 20;
 window.addEventListener("resize", function () {
-  canvas.width = Math.min(window.innerWidth, 1920);
+  canvas.width = Math.min(waxdow.innerWidth, 1920);
   canvas.height = Math.min(window.innerHeight, 1080);
   generateStars(10000);
 });
@@ -366,14 +366,14 @@ function displayPlanetModal(planetName) {
 }
 
 const quotes = [
-  "Exploration is in our nature. We began as wanderers, and we are wanderers still. - Carl Sagan",
-  "Remember to look up at the stars and not down at your feet. - Stephen Hawking",
-  "Somewhere, something incredible is waiting to be known. - Sharon Begley",
-  "The surface of the Earth is the shore of the cosmic ocean. - Carl Sagan",
-  "We're all connected in this vast, empty sea. - Unknown",
+  "Exploration is in our nature. We began as wanderers, and we are wanderers still - Carl Sagan",
+  "Remember to look up at the stars and not down at your feet - Stephen Hawking",
+  "Somewhere, something incredible is waiting to be known - Sharon Begley",
+  "The surface of the Earth is the shore of the cosmic ocean - Carl Sagan",
+  "We're all connected in this vast, empty sea - Unknown",
   "Space is to place as eternity is to time - Joseph Joubert",
-  "We are made of star-stuff. We are a way for the cosmos to know itself. - Carl Sagan",
-  "You are the universe experiencing itself. - Alan Watts",
+  "We are made of star-stuff. We are a way for the cosmos to know itself - Carl Sagan",
+  "You are the universe experiencing itself - Alan Watts",
 ];
 let currentQuoteIndex = 0;
 function getNextQuote() {
@@ -494,12 +494,51 @@ function setupEventListeners() {
   }
 
   // Close the modal when the user clicks on <span> (x)
-  document.getElementById("closeModal").onclick = function () {
-    if (lastClickedPlanet) {
-      lastClickedPlanet.radius *= 5 / 6;
-      lastClickedPlanet = null;
+  window.onclick = function (event) {
+    // Check if the click is outside the planet information modal
+    if (event.target == document.getElementById("planetModal")) {
+      document.getElementById("planetModal").style.display = "none";
+
+      // Reset any changes made to the last clicked planet, if necessary
+      if (lastClickedPlanet) {
+        lastClickedPlanet.radius *= 5 / 6; // Adjust this line based on how you scale your planets when clicked
+        lastClickedPlanet = null;
+      }
     }
-    document.getElementById("planetModal").style.display = "none";
+
+    if (event.target == document.getElementById("infoModal")) {
+      document.getElementById("infoModal").style.display = "none";
+    }
+
+    document
+      .getElementById("infoButton")
+      .addEventListener("click", function () {
+        document.getElementById("infoModal").style.display = "block";
+      });
+
+    window.onclick = function (event) {
+      if (event.target == document.getElementById("infoModal")) {
+        document.getElementById("infoModal").style.display = "none";
+      }
+    };
+
+    window.onclick = function (event) {
+      if (event.target == document.getElementById("planetModal")) {
+        document.getElementById("planetModal").style.display = "none";
+      }
+    };
+
+    document
+      .getElementById("closeInfoModal")
+      .addEventListener("click", function () {
+        document.getElementById("infoModal").style.display = "none";
+      });
+
+    document
+      .getElementById("closePlanetModal")
+      .addEventListener("click", function () {
+        document.getElementById("planetModal").style.display = "none";
+      });
   };
 
   canvas.addEventListener("mousemove", function (event) {
@@ -571,11 +610,6 @@ function setupEventListeners() {
 
   window.addEventListener("mouseup", function () {
     isDragging = false;
-  });
-
-  window.addEventListener("resize", function () {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
   });
 }
 
