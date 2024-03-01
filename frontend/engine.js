@@ -1,12 +1,11 @@
 // matter.js
 
 // allows user slider selection to work
-let gravity = 0.0001; // Universal Gravitational Constant, adjust as needed for your simulation scale
+let gravity = 0.0001; // Universal Gravitational Constant, adjust as needed for simulation scale
 scalar = 20;
 window.addEventListener("resize", function () {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  // Optionally, reposition objects to fit in the new canvas size
 });
 
 // balls balls balls
@@ -58,9 +57,8 @@ class PhysicsObject {
 
       if (!this.isStationary) {
         this.positions.push({ x: this.x, y: this.y });
-        // Optionally, limit the number of stored positions to avoid memory issues
+        // Limit the number of stored positions to avoid memory issues
         if (this.positions.length > 50000) {
-          // Example limit
           this.positions.shift(); // Remove the oldest position
         }
       }
@@ -93,7 +91,7 @@ class PhysicsObject {
     //   this.y + this.radius + 20
     // );
 
-    context.fillStyle = "white"; // Ensure the name is visible against the object color
+    context.fillStyle = "white";
     context.fillText(this.name, this.x, this.y + 20);
 
     context.font = "28px Arial";
@@ -102,8 +100,8 @@ class PhysicsObject {
     context.fillText("Scale Solar System by Dali", canvas.width / 2, 30); // Position text in the middle at the top
 
     context.font = "16px Arial";
-    context.fillStyle = "white"; // Choose a text color that stands out
-    context.textAlign = "center"; // Align text to be in the center
+    context.fillStyle = "white";
+    context.textAlign = "center";
     context.fillText("(sun not to scale)", canvas.width / 2, 50);
   }
 }
@@ -112,8 +110,8 @@ function initializeSolarSystem() {
   objects.length = 0; // Clear existing objects
 
   // Create the Sun
-  const sunRadius = 695508 / 100000; // Example size
-  const sunMass = 1988500 / scalar; // Example mass
+  const sunRadius = 695508 / 100000; // Scale size, no effect on physics
+  const sunMass = 1988500 / scalar; // Scale mass
   const sunX = canvas.width / 2;
   const sunY = canvas.height / 2;
   objects.push(
@@ -165,11 +163,10 @@ function initializeSolarSystem() {
   ];
 
   for (let i = 0; i < 9; i++) {
-    // Example for 8 planets
-    const distance = planetDistances[i] / Math.sqrt(scalar); // Example distance from the Sun
+    const distance = planetDistances[i] / Math.sqrt(scalar); // Distance from the Sun
     const planetRadius = planetRadiuses[i] / 1000; // Varying sizes
     const planetMass = planetMasses[i] / scalar; // Mass based on size (density)
-    const planetColor = planetColors[i]; // Random color
+    const planetColor = planetColors[i];
     const angle = Math.random() * 2 * Math.PI;
     const x = sunX + distance * Math.cos(angle);
     const y = sunY + distance * Math.sin(angle);
@@ -327,7 +324,7 @@ class Comet {
 }
 
 let comets = [];
-const numberOfComets = 3; // Adjust for desired number of comets
+const numberOfComets = 3;
 
 function initializeComets() {
   for (let i = 0; i < numberOfComets; i++) {
@@ -363,8 +360,8 @@ function animate() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  generateStars(400); // Assuming this function exists
-  initializeSolarSystem(); // Assuming this function exists
-  initializeComets(); // Initialize comets
+  generateStars(400);
+  initializeSolarSystem();
+  initializeComets();
   animate();
 });
