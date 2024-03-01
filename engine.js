@@ -15,7 +15,7 @@ let lastClickedPlanet = null;
 setupEventListeners();
 
 // allows user slider selection to work
-let gravity = 0.0001; // Universal Gravitational Constant, adjust as needed for simulation scale
+let gravity = 0.00001; // Universal Gravitational Constant, adjust as needed for simulation scale
 scalar = 20;
 window.addEventListener("resize", function () {
   canvas.width = Math.min(window.innerWidth, 1920);
@@ -330,7 +330,7 @@ function updateAndDrawComets(context) {
 
 function displayPlanetModal(planetName) {
   const planetInfoMap = {
-    Sun: "The solar systems largest nuclear reactor, the Sun is made up of predominantly hydrogen and helium. If the sun in this model were scaled by the same factor as the planets, it would cover the entire screen!",
+    Sun: "The solar systems largest nuclear reactor, the Sun is made up of predominantly hydrogen and helium. If the sun in this model were scaled by the same factor as the planets, it would go past Saturn!",
     Mercury:
       "Mercury, the closest planet to the Sun, is named after the swift messenger god. Good job successfully clicking on this! The surface color is gray, resembling the Moon, with surface temperatures ranging from -173 to 427°C.",
     Venus:
@@ -361,15 +361,28 @@ function displayPlanetModal(planetName) {
 }
 
 function drawFixedText(context) {
-  context.font = "34px Arial";
+  context.font = "36px Arial";
   context.fillStyle = "white"; // Choose a text color that stands out
   context.textAlign = "center"; // Align text to be in the center
-  context.fillText("Scale Solar System by Dali", canvas.width / 2, 30); // Position text in the middle at the top
+  context.fillText("Scale Solar System by Dalí", canvas.width / 2, 30); // Position text in the middle at the top
 
   context.font = "18px Arial";
   context.fillStyle = "white";
   context.textAlign = "center";
-  context.fillText("(sun not to scale)", canvas.width / 2, 50);
+  context.fillText(
+    `(sun not to scale, press "Scale Sun" to see what it would look like!)`,
+    canvas.width / 2,
+    60
+  );
+
+  context.font = "18px Arial";
+  context.fillStyle = "white";
+  context.textAlign = "center";
+  context.fillText(
+    `On this scale, one Earth year passes every 40 seconds`,
+    canvas.width / 2,
+    85
+  );
 }
 
 function animate() {
@@ -516,6 +529,42 @@ function setupEventListeners() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   });
+}
+
+let sunScaled = false; // Variable to track the current state of sun scaling
+
+document
+  .getElementById("scaleSunButton")
+  .addEventListener("click", function () {
+    // Toggle the sun scaling state
+    sunScaled = !sunScaled;
+
+    // Call the function to scale the sun based on the current state
+    scaleSun();
+  });
+
+function scaleSun() {
+  if (sunScaled) {
+    // Update the sun's radius to match the scaling of the planets
+    const sunRadius = 695508 / 1500; // Update the sun's radius to match the scaling of the planets
+
+    // Find the sun object in the objects array and update its radius
+    objects.forEach((object) => {
+      if (object.name === "Sun") {
+        object.radius = sunRadius;
+      }
+    });
+  } else {
+    // Set the sun's radius back to its original value
+    const sunRadius = 695508 / 100000; // Original sun radius
+
+    // Find the sun object in the objects array and update its radius
+    objects.forEach((object) => {
+      if (object.name === "Sun") {
+        object.radius = sunRadius;
+      }
+    });
+  }
 }
 
 document.addEventListener("DOMContentLoaded", initialize);
