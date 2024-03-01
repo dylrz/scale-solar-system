@@ -11,6 +11,7 @@ const objects = [];
 let stars = [];
 let comets = [];
 let lastClickedPlanet = null;
+let sunScaled = false; // Variable to track the current state of sun scaling
 
 setupEventListeners();
 
@@ -106,14 +107,14 @@ class PhysicsObject {
     context.fillStyle = this.color; // Text color
     context.fill();
 
-    context.font = `${Math.sqrt(this.radius)}px Arial`;
+    context.font = `${Math.sqrt(this.radius) * 2}px Arial`;
     context.textAlign = "center";
 
     context.fillStyle = "white";
     context.fillText(
       this.name,
       this.x,
-      this.y + Math.sqrt(this.radius) * 3 + this.radius / 2
+      this.y + this.radius + Math.sqrt(this.radius) * 2
     );
   }
 }
@@ -122,7 +123,7 @@ function initializeSolarSystem() {
   objects.length = 0; // Clear existing objects
 
   // Create the Sun
-  const sunRadius = 695508 / 100000; // Scale size, no effect on physics
+  const sunRadius = 695508 / 110000; // Scale size, no effect on physics
   const sunMass = 1988500 / scalar; // Scale mass
   const sunX = canvas.width / 2;
   const sunY = canvas.height / 2;
@@ -143,14 +144,16 @@ function initializeSolarSystem() {
 
   // distance from sun in 10^6 km
   const planetDistances = [
-    57.9, 108.2, 149.6, 228, 778.5, 1432, 2867, 4515, 5906.4,
+    57.9, 108.2, 149.6, 228, 778.5, 1432, 2867, 4515, 5906.4, 24200,
   ];
   // radius in km
   const planetRadiuses = [
-    2439.5, 6052, 6378, 3396, 71492, 60268, 25559, 24764, 1188,
+    2439.5, 6052, 6378, 3396, 71492, 60268, 25559, 24764, 1188, 1000,
   ];
   // mass in 10^24 kg
-  const planetMasses = [0.33, 4.87, 5.97, 0.642, 1898, 568, 86.8, 102, 0.013];
+  const planetMasses = [
+    0.33, 4.87, 5.97, 0.642, 1898, 568, 86.8, 102, 0.013, 1,
+  ];
   const planetColors = [
     "lightgray",
     "pink",
@@ -161,6 +164,7 @@ function initializeSolarSystem() {
     "#00FFD8",
     "#0023FF",
     "#999",
+    "#fff",
   ];
   const planetNames = [
     "Mercury",
@@ -172,9 +176,10 @@ function initializeSolarSystem() {
     "Uranus",
     "Neptune",
     "Pluto",
+    "Voyager1",
   ];
 
-  for (let i = 0; i < 9; i++) {
+  for (let i = 0; i < 10; i++) {
     const distance = planetDistances[i] / Math.sqrt(scalar); // Distance from the Sun
     const planetRadius = planetRadiuses[i] / 1500; // Varying sizes
     const planetMass = planetMasses[i] / scalar; // Mass based on size (density)
@@ -331,22 +336,23 @@ function displayPlanetModal(planetName) {
   const planetInfoMap = {
     Sun: "The solar systems largest nuclear reactor, the Sun is made up of predominantly hydrogen and helium. If the sun in this model were scaled by the same factor as the planets, it would go past the orbit of Saturn. Click the Scale Sun button and see for yourself!",
     Mercury:
-      "Mercury, the closest planet to the Sun, is named after the swift messenger god. It makes just 1.5 rotations for each orbit around the Sun. The surface color is gray, resembling the Moon, with surface temperatures ranging from -173 to 427°C.",
+      "Mercury, the closest planet to the Sun, is named after the swift messenger god. It rotates just 1.5 times for each orbit it makes around the Sun. The surface color is gray, resembling the Moon, with surface temperatures ranging from -173 to 427°C.",
     Venus:
       "Venus is about 108.2 million km away from the Sun. Known for its bright, yellowish-white color, Venus experiences extreme greenhouse effects, a result of it's C02 rich atmosphere, with surface temperatures hovering around 465°C.",
     Earth:
       "Earth, our home planet. With an average surface temperature of 14°C, it is the only planet in the solar system that can sustain life as we know it. Also, the only planet known to support Instagram Reels. Better take good care of it!",
     Mars: "Mars, known as the Red Planet, is 227.9 million km from the Sun, and was once the home of famous actor Matt Damon. Its reddish appearance comes from the plentiful iron oxide dust. Temperatures on Mars can vary widely, averaging around -60°C.",
     Jupiter:
-      "Jupiter, the largest planet in our solar system, has a mass of 1,898 x 10^24 kg (or 17,434 trillion blue whales for you Americans) and is 778.5 million km from the Sun. Its striking appearance with bands of white, red, orange, brown, and yellow are due to its gaseous nature. The average temperature is about -145°C.",
+      "Jupiter, the largest planet in our solar system, has a mass of 1,898 x 10^24 kg (or 17,434 trillion blue whales for you Americans) and is 778.5 million km from the Sun. Its striking appearance with bands of white, red, orange, brown, and yellow are due to its gaseous nature. This gas giant is so large that over 1,300 Earths could fit inside of it. The average temperature is about -145°C.",
     Saturn:
       "Saturn, famous for its beautiful ring system, is about 1.434 billion km away from the Sun (Just a tad closer than you've ever been to feeling true love). Its pale yellow color is due to ammonia crystals in its atmosphere. Temperatures are cold, averaging -178°C.",
     Uranus:
-      "Uranus, the brunt of many a joke, is distinguished by its blue-green color, occuring due to methane in its atmosphere. It is 2.871 billion km from the Sun, and has an unusual tilt, essentially orbiting the Sun on its side, which scientists attribute to a collision with an Earth-sized object a very long time ago. Average temperatures are around -224°C.",
+      "Uranus, the brunt of many a joke, is distinguished by its blue-green color, occuring due to methane in its atmosphere. It is 2.871 billion km from the Sun, and has an unusual tilt, essentially orbiting the Sun on its side, which scientists attribute to a collision with an Earth-sized object a very long time ago. Average temperatures are around -195°C.",
     Neptune:
-      "Neptune is known for its vivid blue color, and holds the record for the fastest winds in the solar system. Scientists suspect that it rains diamonds 8,000km under the 'surface'. It is 4.495 billion km from the Sun and is the coldest of the planets, with temperatures dipping to -214°C. Brr.",
+      "Neptune is known for its vivid blue color, and holds the record for the fastest winds in the solar system. Scientists suspect that it rains diamonds 8,000km under the Neptunian surface. It is 4.495 billion km from the Sun and is the coldest of the planets, with temperatures dipping to -214°C. Brr.",
     Pluto:
       "If you somehow clicked on this, congrats. Pluto, arguably the most beloved object in the Solar system, is 5.906 billion km from the Sun. Its color varies from white to charcoal black, with surface temperatures averaging -229°C. Pluto was reclassified as a dwarf planet in 2006, and has a heart-shaped glacier to show it loves us too.",
+    Voyager1: `As of today, Voyager 1 is the most distant man made object ever. The spacecraft carries a gold-plated audio-visual disc, known as the Golden Record. The record contains photos of Earth and its lifeforms, a range of scientific information, spoken greetings in 55 languages, and a collection of music, including works by Mozart and Chuck Berry, in case the spacecraft is ever found by intelligent life forms from other planetary systems. At 24 billion km away from the Earth, communications take about 40 hours round trip. Talk about a long distance relationship.`,
   };
 
   const info = planetInfoMap[planetName];
@@ -359,25 +365,57 @@ function displayPlanetModal(planetName) {
   }
 }
 
+const quotes = [
+  "Exploration is in our nature. We began as wanderers, and we are wanderers still. - Carl Sagan",
+  "Remember to look up at the stars and not down at your feet. - Stephen Hawking",
+  "Somewhere, something incredible is waiting to be known. - Sharon Begley",
+  "The surface of the Earth is the shore of the cosmic ocean. - Carl Sagan",
+  "We're all connected in this vast, empty sea. - Unknown",
+  "Space is to place as eternity is to time - Joseph Joubert",
+  "We are made of star-stuff. We are a way for the cosmos to know itself. - Carl Sagan",
+  "You are the universe experiencing itself. - Alan Watts",
+];
+let currentQuoteIndex = 0;
+function getNextQuote() {
+  currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+  return quotes[currentQuoteIndex];
+}
+function drawQuote(context) {
+  context.font = "22px Arial";
+  context.fillStyle = "white";
+  context.textAlign = "center";
+  const quote = quotes[currentQuoteIndex];
+  context.fillText(quote, canvas.width / 2, 80);
+}
+setInterval(() => {
+  getNextQuote();
+}, 6000);
+
 function drawFixedText(context) {
-  context.font = "36px Arial";
+  context.font = "42px Arial";
   context.fillStyle = "white"; // Choose a text color that stands out
   context.textAlign = "center"; // Align text to be in the center
   context.fillText("Scale Solar System by Dalí", canvas.width / 2, 30); // Position text in the middle at the top
 
-  context.font = "18px Arial";
-  context.fillStyle = "white";
-  context.textAlign = "center";
-  context.fillText(
-    `One Earth year passes every 16 seconds`,
-    canvas.width / 2,
-    60
-  );
+  // context.font = "18px Arial";
+  // context.fillStyle = "white";
+  // context.textAlign = "center";
+  // context.fillText(
+  //   `One Earth year passes every 16 seconds`,
+  //   canvas.width / 2,
+  //   60
+  // );
 
-  context.font = "18px Arial";
-  context.fillStyle = "white";
-  context.textAlign = "center";
-  context.fillText(`Try to find Pluto!`, canvas.width / 2, 85);
+  // context.font = "18px Arial";
+  // context.fillStyle = "white";
+  // context.textAlign = "center";
+  // context.fillText(
+  //   `(there's a small "star" out there that doesn't look like the rest)`,
+  //   canvas.width / 2,
+  //   85
+  // );
+
+  drawQuote(context);
 }
 
 function animate() {
@@ -541,8 +579,6 @@ function setupEventListeners() {
   });
 }
 
-let sunScaled = false; // Variable to track the current state of sun scaling
-
 document
   .getElementById("scaleSunButton")
   .addEventListener("click", function () {
@@ -554,26 +590,20 @@ document
   });
 
 function scaleSun() {
-  if (sunScaled) {
-    // Update the sun's radius to match the scaling of the planets
-    const sunRadius = 695508 / 1500; // Update the sun's radius to match the scaling of the planets
+  // Define the scale factor
+  const scaledSunRadius = 695508 / 1500;
+  const originalSunRadius = 695508 / 110000;
 
-    // Find the sun object in the objects array and update its radius
-    objects.forEach((object) => {
-      if (object.name === "Sun") {
-        object.radius = sunRadius;
-      }
-    });
-  } else {
-    // Set the sun's radius back to its original value
-    const sunRadius = 695508 / 100000; // Original sun radius
-
-    // Find the sun object in the objects array and update its radius
-    objects.forEach((object) => {
-      if (object.name === "Sun") {
-        object.radius = sunRadius;
-      }
-    });
+  // Find the Sun object and update its radius
+  const sunObject = objects.find((object) => object.name === "Sun");
+  if (sunObject) {
+    if (sunScaled) {
+      sunObject.radius = scaledSunRadius;
+      sunObject.originalRadius = scaledSunRadius; // Update originalRadius to scaled value
+    } else {
+      sunObject.radius = originalSunRadius;
+      sunObject.originalRadius = originalSunRadius; // Reset originalRadius to its original value
+    }
   }
 }
 
