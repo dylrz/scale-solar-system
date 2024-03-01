@@ -1,0 +1,23 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    background: #222;
+  }
+  
+canvas {
+    background: #222;
+    display: block;
+  }
+
+label {
+    color:#fff;
+}
+input {
+    color:#222;
+}
+
+.bar-div {
+    background-color: #444;
+    align-content: center;
+    justify-content: center;
+}
