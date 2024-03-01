@@ -106,7 +106,7 @@ class PhysicsObject {
     context.fillStyle = this.color; // Text color
     context.fill();
 
-    context.font = "12px Arial";
+    context.font = `${Math.sqrt(this.radius)}px Arial`;
     context.textAlign = "center";
     // context.fillText(
     //   `Mass: ${Number(this.mass).toPrecision(2)}`,
@@ -115,7 +115,11 @@ class PhysicsObject {
     // );
 
     context.fillStyle = "white";
-    context.fillText(this.name, this.x, this.y + 20);
+    context.fillText(
+      this.name,
+      this.x,
+      this.y + Math.sqrt(this.radius) * 3 + this.radius / 2
+    );
   }
 }
 
@@ -330,7 +334,7 @@ function updateAndDrawComets(context) {
 
 function displayPlanetModal(planetName) {
   const planetInfoMap = {
-    Sun: "The solar systems largest nuclear reactor, the Sun is made up of predominantly hydrogen and helium. If the sun in this model were scaled by the same factor as the planets, it would go past Saturn!",
+    Sun: "The solar systems largest nuclear reactor, the Sun is made up of predominantly hydrogen and helium. If the sun in this model were scaled by the same factor as the planets, it would go past the orbit of Saturn. Click the Scale Sun button and see for yourself!",
     Mercury:
       "Mercury, the closest planet to the Sun, is named after the swift messenger god. Good job successfully clicking on this! The surface color is gray, resembling the Moon, with surface temperatures ranging from -173 to 427°C.",
     Venus:
@@ -345,9 +349,9 @@ function displayPlanetModal(planetName) {
     Uranus:
       "Uranus, the brunt of many a joke, is distinguished by its blue-green color, occuring due to methane in its atmosphere. It is 2.871 billion km from the Sun, and has an unusual tilt, essentially orbiting the Sun on its side, which scientists attribute to a collision with an Earth-sized object a very long time ago. Average temperatures are around -224°C.",
     Neptune:
-      "Neptune is known for its vivid blue color, and holds the record for the fastest winds in the solar system. It 4.495 billion km from the Sun and is the coldest of the planets, with temperatures dipping to -214°C. Brr.",
+      "Neptune is known for its vivid blue color, and holds the record for the fastest winds in the solar system. Scientists suspect that it rains diamonds 8,000km under the 'surface'. It is 4.495 billion km from the Sun and is the coldest of the planets, with temperatures dipping to -214°C. Brr.",
     Pluto:
-      "If you somehow clicked on this, congrats. Pluto, the most relatable planet, is 5.906 billion km from the Sun. Its color varies from white to charcoal black, with surface temperatures averaging -229°C. Pluto was reclassified as a dwarf planet in 2006, and has a heart-shaped glacier to show it still loves us.",
+      "If you somehow clicked on this, congrats. Pluto, arguably the most beloved object in the Solar system, is 5.906 billion km from the Sun. Its color varies from white to charcoal black, with surface temperatures averaging -229°C. Pluto was reclassified as a dwarf planet in 2006, and has a heart-shaped glacier to show it loves us too.",
   };
 
   const info = planetInfoMap[planetName];
@@ -370,19 +374,15 @@ function drawFixedText(context) {
   context.fillStyle = "white";
   context.textAlign = "center";
   context.fillText(
-    `On this scale, one Earth year passes every 40 seconds`,
+    `One Earth year passes every 40 seconds`,
     canvas.width / 2,
     60
   );
 
-  context.font = "16px Arial";
+  context.font = "18px Arial";
   context.fillStyle = "white";
   context.textAlign = "center";
-  context.fillText(
-    `(sun not to scale, press "Scale Sun" to see what it would look like!)`,
-    canvas.width / 2,
-    85
-  );
+  context.fillText(`Try to find Pluto!`, canvas.width / 2, 85);
 }
 
 function animate() {
@@ -431,7 +431,21 @@ function setupEventListeners() {
     const rect = canvas.getBoundingClientRect();
     const x = (event.clientX - rect.left) / scale - pan.x / scale;
     const y = (event.clientY - rect.top) / scale - pan.y / scale;
-    checkPlanetClick(x, y);
+
+    const modal = document.getElementById("planetModal");
+    if (
+      modal.style.display === "block" &&
+      !event.target.closest("#planetModal")
+    ) {
+      // If it did and the modal is open, close the modal
+      if (lastClickedPlanet) {
+        lastClickedPlanet.radius *= 5 / 6;
+        lastClickedPlanet = null;
+      }
+      modal.style.display = "none";
+    } else {
+      checkPlanetClick(x, y);
+    }
   });
 
   function checkPlanetClick(x, y) {
@@ -445,6 +459,7 @@ function setupEventListeners() {
       }
     });
   }
+
   // Close the modal when the user clicks on <span> (x)
   document.getElementById("closeModal").onclick = function () {
     if (lastClickedPlanet) {
