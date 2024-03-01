@@ -21,7 +21,7 @@ scalar = 20;
 window.addEventListener("resize", function () {
   canvas.width = Math.min(window.innerWidth, 1920);
   canvas.height = Math.min(window.innerHeight, 1080);
-  generateStars(10000);
+  generateStars(8000);
 });
 
 // zoom and scroll
@@ -454,7 +454,7 @@ function animate() {
 function initialize() {
   // Initialize solar system, stars, and any other initial setup
   initializeSolarSystem();
-  generateStars(50000); // Adjust count based on your needs
+  generateStars(30000); // Adjust count based on your needs
   initializeComets();
   animate();
 }
@@ -639,6 +639,38 @@ function scaleSun() {
       sunObject.originalRadius = originalSunRadius; // Reset originalRadius to its original value
     }
   }
+}
+
+canvas.addEventListener("touchstart", handleStart, false);
+canvas.addEventListener("touchmove", handleMove, false);
+canvas.addEventListener("touchend", handleEnd, false);
+
+function handleStart(event) {
+  event.preventDefault(); // Prevent scrolling when touching the canvas
+  isDragging = true;
+
+  // Use the first touch point
+  const touches = event.touches[0];
+  dragStart.x = touches.clientX - pan.x;
+  dragStart.y = touches.clientY - pan.y;
+}
+
+function handleMove(event) {
+  event.preventDefault(); // Prevent scrolling when touching the canvas
+  if (isDragging) {
+    const touches = event.touches[0];
+    pan.x = touches.clientX - dragStart.x;
+    pan.y = touches.clientY - dragStart.y;
+
+    // You may want to call a function to redraw the canvas here
+  }
+}
+
+function handleEnd(event) {
+  event.preventDefault(); // Prevent additional actions on touch end
+  isDragging = false;
+
+  // You may also want to adjust any final positions and redraw here
 }
 
 document.addEventListener("DOMContentLoaded", initialize);
