@@ -82,7 +82,7 @@ class PhysicsObject {
       if (!this.isStationary) {
         this.positions.push({ x: this.x, y: this.y });
         // Limit the number of stored positions to avoid memory issues
-        if (this.positions.length > 50000) {
+        if (this.positions.length > 20000) {
           this.positions.shift(); // Remove the oldest position
         }
       }
@@ -176,7 +176,7 @@ function initializeSolarSystem() {
     "Uranus",
     "Neptune",
     "Pluto",
-    "Voyager1",
+    "Voyager 1",
   ];
 
   for (let i = 0; i < 10; i++) {
@@ -330,8 +330,7 @@ function updateAndDrawComets(context) {
   });
 }
 
-// for planet information
-
+// planet information
 function displayPlanetModal(planetName) {
   const planetInfoMap = {
     Sun: "The solar systems largest nuclear reactor, the Sun is made up of predominantly hydrogen and helium. If the sun in this model were scaled by the same factor as the planets, it would go past the orbit of Saturn. Click the Scale Sun button and see for yourself!",
@@ -351,8 +350,8 @@ function displayPlanetModal(planetName) {
     Neptune:
       "Neptune is known for its vivid blue color, and holds the record for the fastest winds in the solar system. Scientists suspect that it rains diamonds 8,000km under the Neptunian surface. It is 4.495 billion km from the Sun and is the coldest of the planets, with temperatures dipping to -214°C. Brr.",
     Pluto:
-      "If you somehow clicked on this, congrats. Pluto, arguably the most beloved object in the Solar system, is 5.906 billion km from the Sun. Its color varies from white to charcoal black, with surface temperatures averaging -229°C. Pluto was reclassified as a dwarf planet in 2006, and has a heart-shaped glacier to show it loves us too.",
-    Voyager1: `As of today, Voyager 1 is the most distant man made object ever. The spacecraft carries a gold-plated audio-visual disc, known as the Golden Record. The record contains photos of Earth and its lifeforms, a range of scientific information, spoken greetings in 55 languages, and a collection of music, including works by Mozart and Chuck Berry, in case the spacecraft is ever found by intelligent life forms from other planetary systems. At 24 billion km away from the Earth, communications take about 40 hours round trip. Talk about a long distance relationship.`,
+      "Pluto, arguably the most beloved object in the Solar system, is 5.906 billion km from the Sun. Its color varies from white to charcoal black, with surface temperatures averaging -229°C. Pluto was reclassified as a dwarf planet in 2006, and has a heart-shaped glacier to show that it still loves us too.",
+    "Voyager 1": `As of today, Voyager 1 is the most distant man made object ever. The spacecraft carries a gold-plated audio-visual disc, known as the Golden Record. The record contains photos of Earth and its lifeforms, a range of scientific information, spoken greetings in 55 languages, and a collection of music, including works by Mozart and Chuck Berry, in case the spacecraft is ever found by intelligent life forms from other planetary systems. At 24 billion km away from the Earth, communications take about 40 hours round trip. Talk about a long distance relationship.`,
   };
 
   const info = planetInfoMap[planetName];
@@ -374,6 +373,7 @@ const quotes = [
   "Space is to place as eternity is to time - Joseph Joubert",
   "We are made of star-stuff. We are a way for the cosmos to know itself - Carl Sagan",
   "You are the universe experiencing itself - Alan Watts",
+  "Earth is the cradle of humanity, but one cannot live in a cradle forever - Konstantin Tsiolkovsky",
 ];
 let currentQuoteIndex = 0;
 function getNextQuote() {
