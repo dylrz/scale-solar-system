@@ -19,7 +19,7 @@ setupEventListeners();
 let gravity = 0.00001; // Universal Gravitational Constant, adjust as needed for simulation scale
 scalar = 20;
 window.addEventListener("resize", function () {
-  canvas.width = Math.min(waxdow.innerWidth, 1920);
+  canvas.width = Math.min(window.innerWidth, 1920);
   canvas.height = Math.min(window.innerHeight, 1080);
   generateStars(10000);
 });

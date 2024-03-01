@@ -65,3 +65,15 @@ p {
 span {
   color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;
 }
+
+@media (max-width: 768px) {
+  /* Adjust styles for smaller screens */
+  button {
+    padding: 10px;
+    font-size: 16px;
+  }
+  #infoButton, #scaleSunButton {
+    top: 10px;
+    right: 10px;
+  }
+}
