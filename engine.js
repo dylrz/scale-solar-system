@@ -108,11 +108,6 @@ class PhysicsObject {
 
     context.font = `${Math.sqrt(this.radius)}px Arial`;
     context.textAlign = "center";
-    // context.fillText(
-    //   `Mass: ${Number(this.mass).toPrecision(2)}`,
-    //   this.x,
-    //   this.y + this.radius + 20
-    // );
 
     context.fillStyle = "white";
     context.fillText(
@@ -315,7 +310,7 @@ class Comet {
     context.fill();
   }
 }
-const numberOfComets = 3;
+const numberOfComets = 8;
 
 function initializeComets() {
   for (let i = 0; i < numberOfComets; i++) {
@@ -336,7 +331,7 @@ function displayPlanetModal(planetName) {
   const planetInfoMap = {
     Sun: "The solar systems largest nuclear reactor, the Sun is made up of predominantly hydrogen and helium. If the sun in this model were scaled by the same factor as the planets, it would go past the orbit of Saturn. Click the Scale Sun button and see for yourself!",
     Mercury:
-      "Mercury, the closest planet to the Sun, is named after the swift messenger god. Good job successfully clicking on this! The surface color is gray, resembling the Moon, with surface temperatures ranging from -173 to 427°C.",
+      "Mercury, the closest planet to the Sun, is named after the swift messenger god. It makes just 1.5 rotations for each orbit around the Sun. The surface color is gray, resembling the Moon, with surface temperatures ranging from -173 to 427°C.",
     Venus:
       "Venus is about 108.2 million km away from the Sun. Known for its bright, yellowish-white color, Venus experiences extreme greenhouse effects, a result of it's C02 rich atmosphere, with surface temperatures hovering around 465°C.",
     Earth:
@@ -374,7 +369,7 @@ function drawFixedText(context) {
   context.fillStyle = "white";
   context.textAlign = "center";
   context.fillText(
-    `One Earth year passes every 40 seconds`,
+    `One Earth year passes every 16 seconds`,
     canvas.width / 2,
     60
   );
@@ -421,7 +416,7 @@ function animate() {
 function initialize() {
   // Initialize solar system, stars, and any other initial setup
   initializeSolarSystem();
-  generateStars(8000); // Adjust count based on your needs
+  generateStars(50000); // Adjust count based on your needs
   initializeComets();
   animate();
 }
