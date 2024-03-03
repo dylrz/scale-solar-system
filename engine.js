@@ -1,4 +1,4 @@
-// matter.js
+// engine.js
 
 // Set up the canvas
 const canvas = document.createElement("canvas");
@@ -375,45 +375,32 @@ const quotes = [
   "You are the universe experiencing itself - Alan Watts",
   "Earth is the cradle of humanity, but one cannot live in a cradle forever - Konstantin Tsiolkovsky",
 ];
+
 let currentQuoteIndex = 0;
 function getNextQuote() {
   currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
   return quotes[currentQuoteIndex];
 }
+
 function drawQuote(context) {
-  context.font = "22px Arial";
+  const baseFontSize = Math.max(window.innerWidth / 80, 16);
+  context.font = `${baseFontSize}px Arial`;
   context.fillStyle = "white";
   context.textAlign = "center";
   const quote = quotes[currentQuoteIndex];
   context.fillText(quote, canvas.width / 2, 80);
 }
+
 setInterval(() => {
   getNextQuote();
 }, 6000);
 
 function drawFixedText(context) {
-  context.font = "42px Arial";
-  context.fillStyle = "white"; // Choose a text color that stands out
-  context.textAlign = "center"; // Align text to be in the center
-  context.fillText("Scale Solar System by Dalí", canvas.width / 2, 30); // Position text in the middle at the top
-
-  // context.font = "18px Arial";
-  // context.fillStyle = "white";
-  // context.textAlign = "center";
-  // context.fillText(
-  //   `One Earth year passes every 16 seconds`,
-  //   canvas.width / 2,
-  //   60
-  // );
-
-  // context.font = "18px Arial";
-  // context.fillStyle = "white";
-  // context.textAlign = "center";
-  // context.fillText(
-  //   `(there's a small "star" out there that doesn't look like the rest)`,
-  //   canvas.width / 2,
-  //   85
-  // );
+  const baseFontSize = Math.max(window.innerWidth / 50, 30); // Ensure the font size does not go below 18px
+  context.font = `${baseFontSize}px Arial`;
+  context.fillStyle = "white";
+  context.textAlign = "center";
+  context.fillText("Scale Solar System", canvas.width / 2, baseFontSize); // Adjust position based on font size
 
   drawQuote(context);
 }
@@ -667,10 +654,15 @@ function handleMove(event) {
 }
 
 function handleEnd(event) {
-  event.preventDefault(); // Prevent additional actions on touch end
+  event.preventDefault();
   isDragging = false;
 
-  // You may also want to adjust any final positions and redraw here
+  const touches = event.changedTouches[0]; // Get the touch that ended
+  const rect = canvas.getBoundingClientRect();
+  const x = (touches.clientX - rect.left) / scale - pan.x / scale;
+  const y = (touches.clientY - rect.top) / scale - pan.y / scale;
+
+  checkPlanetClick(x, y); // Assuming checkPlanetClick is accessible in this scope
 }
 
 document.addEventListener("DOMContentLoaded", initialize);
