@@ -18,10 +18,11 @@ setupEventListeners();
 // allows user slider selection to work
 let gravity = 0.00001; // Universal Gravitational Constant, adjust as needed for simulation scale
 scalar = 20;
+
 window.addEventListener("resize", function () {
-  canvas.width = Math.min(window.innerWidth, 1920);
-  canvas.height = Math.min(window.innerHeight, 1080);
-  generateStars(8000);
+  canvas.width = Math.max(window.innerWidth, 1920);
+  canvas.height = Math.max(window.innerHeight, 1080);
+  generateStars(20000);
 });
 
 // zoom and scroll
@@ -232,9 +233,12 @@ let maxViewHeight = canvas.height * 8;
 
 function generateStars(count) {
   stars = [];
+  const starFieldWidth = canvas.width * 8;
+  const starFieldHeight = canvas.height * 8;
+
   for (let i = 0; i < count; i++) {
-    const x = Math.random() * maxViewWidth - maxViewWidth / 2;
-    const y = Math.random() * maxViewHeight - maxViewHeight / 2;
+    const x = Math.random() * starFieldWidth - starFieldWidth / 2;
+    const y = Math.random() * starFieldHeight - starFieldHeight / 2;
     const size = Math.random() * 2; // Size range between 0 and 2 pixels
     stars.push(new Star(x, y, size));
   }
@@ -382,27 +386,52 @@ function getNextQuote() {
   return quotes[currentQuoteIndex];
 }
 
-function drawQuote(context) {
-  const baseFontSize = Math.max(window.innerWidth / 80, 16);
+function drawQuote(context, canvas, startingYPosition) {
+  const maxWidth = window.innerWidth;
+  const minFontSize = 10;
+  const maxFontSize = 20;
+
+  let baseFontSize = Math.max(maxWidth / 100, minFontSize);
+  baseFontSize = Math.min(baseFontSize, maxFontSize);
+
   context.font = `${baseFontSize}px Arial`;
   context.fillStyle = "white";
   context.textAlign = "center";
-  const quote = quotes[currentQuoteIndex];
-  context.fillText(quote, canvas.width / 2, 80);
-}
+  const quoteText = quotes[currentQuoteIndex];
 
+  // Split the quote and the author
+  const splitIndex = quoteText.lastIndexOf(" - ");
+  const quote = quoteText.substring(0, splitIndex);
+  const author = "- " + quoteText.substring(splitIndex + 3);
+
+  context.fillText(quote, window.innerWidth / 2, startingYPosition);
+
+  const authorFontSize = Math.max(baseFontSize * 0.8, minFontSize);
+  context.font = `${authorFontSize}px Arial`;
+
+  const lineSpacing = baseFontSize * 1.2;
+  context.fillText(
+    author,
+    window.innerWidth / 2,
+    startingYPosition + lineSpacing
+  );
+}
 setInterval(() => {
   getNextQuote();
-}, 6000);
+}, 5000);
 
-function drawFixedText(context) {
-  const baseFontSize = Math.max(window.innerWidth / 50, 30); // Ensure the font size does not go below 18px
-  context.font = `${baseFontSize}px Arial`;
+function drawFixedText(context, canvas) {
+  const titleFontSize = Math.max(window.innerWidth / 50, 38);
+  context.font = `${titleFontSize}px Arial`;
   context.fillStyle = "white";
   context.textAlign = "center";
-  context.fillText("Scale Solar System", canvas.width / 2, baseFontSize); // Adjust position based on font size
 
-  drawQuote(context);
+  // Draw the title at a fixed position
+  const titleYPosition = titleFontSize + 12; // Adjusted to include some top padding
+  context.fillText("Scale Solar System", window.innerWidth / 2, titleYPosition);
+
+  // Now draw the quote 10 pixels under the title
+  drawQuote(context, canvas, titleYPosition + 6 + window.innerWidth / 50);
 }
 
 function animate() {
@@ -441,7 +470,7 @@ function animate() {
 function initialize() {
   // Initialize solar system, stars, and any other initial setup
   initializeSolarSystem();
-  generateStars(30000); // Adjust count based on your needs
+  generateStars(20000); // Adjust count based on your needs
   initializeComets();
   animate();
 }
@@ -472,10 +501,8 @@ function setupEventListeners() {
     objects.forEach((object) => {
       const distance = Math.sqrt((x - object.x) ** 2 + (y - object.y) ** 2);
       if (distance < object.radius) {
-        // The planet has been clicked
         object.radius *= 1.2; // Enlarge the planet by 50%
-        lastClickedPlanet = object;
-        displayPlanetModal(object.name); // Open information page based on the planet name
+        displayPlanetModal(object.name);
       }
     });
   }
@@ -598,6 +625,10 @@ function setupEventListeners() {
   window.addEventListener("mouseup", function () {
     isDragging = false;
   });
+
+  canvas.addEventListener("touchstart", handleStart, false);
+  canvas.addEventListener("touchmove", handleMove, false);
+  canvas.addEventListener("touchend", handleEnd, false);
 }
 
 document
@@ -628,12 +659,8 @@ function scaleSun() {
   }
 }
 
-canvas.addEventListener("touchstart", handleStart, false);
-canvas.addEventListener("touchmove", handleMove, false);
-canvas.addEventListener("touchend", handleEnd, false);
-
 function handleStart(event) {
-  event.preventDefault(); // Prevent scrolling when touching the canvas
+  event.preventDefault();
   isDragging = true;
 
   // Use the first touch point
@@ -643,13 +670,12 @@ function handleStart(event) {
 }
 
 function handleMove(event) {
-  event.preventDefault(); // Prevent scrolling when touching the canvas
+  event.preventDefault();
+  console.log("handleMove");
   if (isDragging) {
     const touches = event.touches[0];
     pan.x = touches.clientX - dragStart.x;
     pan.y = touches.clientY - dragStart.y;
-
-    // You may want to call a function to redraw the canvas here
   }
 }
 
@@ -657,12 +683,19 @@ function handleEnd(event) {
   event.preventDefault();
   isDragging = false;
 
-  const touches = event.changedTouches[0]; // Get the touch that ended
-  const rect = canvas.getBoundingClientRect();
-  const x = (touches.clientX - rect.left) / scale - pan.x / scale;
-  const y = (touches.clientY - rect.top) / scale - pan.y / scale;
+  const touchPosition = getCanvasTouchPosition(event);
+  console.log("Touch position:", touchPosition);
+  // Use this position to check if a planet was tapped
+  checkPlanetClick(touchPosition.x, touchPosition.y);
+}
 
-  checkPlanetClick(x, y); // Assuming checkPlanetClick is accessible in this scope
+function getCanvasTouchPosition(event) {
+  const canvasRect = canvas.getBoundingClientRect();
+  // Use changedTouches for touchend events
+  const touches = event.changedTouches[0];
+  const x = (touches.clientX - canvasRect.left) / scale - pan.x / scale;
+  const y = (touches.clientY - canvasRect.top) / scale - pan.y / scale;
+  return { x, y };
 }
 
 document.addEventListener("DOMContentLoaded", initialize);
