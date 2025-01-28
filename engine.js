@@ -201,8 +201,8 @@ function initializeSolarSystem() {
       planetNames[i],
       "white"
     );
-    planet.velocity.x = velocityMagnitude * -Math.sin(angle);
-    planet.velocity.y = velocityMagnitude * Math.cos(angle);
+    planet.velocity.x = velocityMagnitude * Math.sin(angle);
+    planet.velocity.y = velocityMagnitude * -Math.cos(angle);
 
     objects.push(planet);
   }
@@ -337,16 +337,16 @@ function updateAndDrawComets(context) {
 // planet information
 function displayPlanetModal(planetName) {
   const planetInfoMap = {
-    Sun: "The solar systems largest nuclear reactor, the Sun is made up of predominantly hydrogen and helium. If the sun in this model were scaled by the same factor as the planets, it would go past the orbit of Saturn. Click the Scale Sun button and see for yourself!",
+    Sun: "The solar systems largest nuclear reactor, the Sun is made up of predominantly hydrogen and helium. It's so massive that if scaled proportionally in this model, it would stretch beyond Saturn's orbit - try the Scale Sun button to witness its true enormity! Fun fact: This stellar powerhouse generates more energy in a second than humanity has produced in all of history.",
     Mercury:
-      "Mercury, the closest planet to the Sun, is named after the swift messenger god. It rotates just 1.5 times for each orbit it makes around the Sun. The surface color is gray, resembling the Moon, with surface temperatures ranging from -173 to 427°C.",
+      "Mercury, the closest planet to the Sun, is named after the swift messenger god. It rotates just 1.5 times for each orbit it makes around the Sun. It's surface is gray, resembling the Moon, with temperatures fluctuating wildly between -173 to 427°C.",
     Venus:
       "Venus is about 108.2 million km away from the Sun. Known for its bright, yellowish-white color, Venus experiences extreme greenhouse effects, a result of it's C02 rich atmosphere, with surface temperatures hovering around 465°C.",
     Earth:
       "Earth, our home planet. With an average surface temperature of 14°C, it is the only planet in the solar system that can sustain life as we know it. Also, the only planet known to support Instagram Reels. Better take good care of it!",
     Mars: "Mars, known as the Red Planet, is 227.9 million km from the Sun, and was once the home of famous actor Matt Damon. Its reddish appearance comes from the plentiful iron oxide dust. Temperatures on Mars can vary widely, averaging around -60°C.",
     Jupiter:
-      "Jupiter, the largest planet in our solar system, has a mass of 1,898 x 10^24 kg (or 17,434 trillion blue whales for you Americans) and is 778.5 million km from the Sun. Its striking appearance with bands of white, red, orange, brown, and yellow are due to its gaseous nature. This gas giant is so large that over 1,300 Earths could fit inside of it. The average temperature is about -145°C.",
+      "Jupiter, the largest planet in our solar system, has a mass of 1,898 x 10^24 kg (or 17,434 trillion blue whales for you Americans) and is 778.5 million km from the Sun. Its striking appearance, with bands of white, red, orange, brown, and yellow are due to its gaseous nature. This gas giant is so large that over 1,300 Earths could fit inside it. The average temperature is about -145°C.",
     Saturn:
       "Saturn, famous for its beautiful ring system, is about 1.434 billion km away from the Sun (Just a tad closer than you've ever been to feeling true love). Its pale yellow color is due to ammonia crystals in its atmosphere. Temperatures are cold, averaging -178°C.",
     Uranus:
@@ -388,7 +388,7 @@ function getNextQuote() {
 
 function drawQuote(context, canvas, startingYPosition) {
   const maxWidth = window.innerWidth;
-  const minFontSize = 10;
+  const minFontSize = 12;
   const maxFontSize = 20;
 
   let baseFontSize = Math.max(maxWidth / 100, minFontSize);
